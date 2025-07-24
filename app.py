@@ -13,11 +13,14 @@ import threading
 # مكتبة MongoDB
 from pymongo import MongoClient
 from bson import ObjectId  # لاستخدام ObjectId في الموافقة/الرفض
+from dotenv import load_dotenv
 
 # ----------------------------------
 # إعدادات MongoDB
 # ----------------------------------
-MONGO_URI = "mongodb+srv://azal12345zz:KhKZxYFldC2Uz5BC@cluster0.fruat.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+load_dotenv()
+
+MONGO_URI =  os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
 DB_NAME = "mydatabase"
 db = client[DB_NAME]
@@ -26,7 +29,18 @@ admins_coll = db["admins"]                 # لتخزين أسماء الأدم�
 users_coll = db["users"]                   # بيانات كل مستخدم في مستند واحد {username, accounts:[]}
 accounts_for_sale_coll = db["accounts_for_sale"]   # الحسابات المعروضة للبيع
 subscribers_coll = db["subscribers"]       # قائمة الـ chat_id للمشتركين
-purchase_requests_coll = db["purchase_requests"]   # طلبات الشراء المعلقة
+purchase_requests_coll = db["purchase_requests"] 
+# طلبات الشراء المعلقة
+# ----------------------------------
+# إعداد البوت و Flask
+# ----------------------------------
+TOKEN = os.getenv("TOKEN")
+EMAIL = os.getenv("EMAIL")
+PASSWORD = os.getenv("PASSWORD")
+IMAP_SERVER = os.getenv("IMAP_SERVER")
+bot = telebot.TeleBot(TOKEN)
+app = Flask(__name__)
+
 
 def init_db():
     """
@@ -184,16 +198,7 @@ def get_subscribers() -> list:
     docs = subscribers_coll.find()
     return [doc["chat_id"] for doc in docs]
 
-# ----------------------------------
-# إعداد البوت و Flask
-# ----------------------------------
-TOKEN = "7801426148:AAERaD89BYEKegqGSi8qSQ-Xooj8yJs41I4"
-bot = telebot.TeleBot(TOKEN)
-app = Flask(__name__)
 
-EMAIL = "azal12345zz@gmail.com"
-PASSWORD = "noph rexm qifb kvog"
-IMAP_SERVER = "imap.gmail.com"
 
 # قاموس مؤقت في الذاكرة لتخزين الحساب المحدد لكل مستخدم
 user_accounts = {}
